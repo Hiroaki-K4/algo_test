@@ -84,6 +84,7 @@ def rb_insert_fixup(root: Node, new_node: Node) -> None:
                 y.color = "gray"
                 new_node.parent.parent.color = "red"
                 new_node = new_node.parent.parent
+                print("new: ", new_node.key)
             elif new_node == new_node.parent.right:
                 new_node = new_node.parent
                 left_rotate(root, new_node)
@@ -92,20 +93,20 @@ def rb_insert_fixup(root: Node, new_node: Node) -> None:
                 new_node.parent.parent.color = "red"
                 right_rotate(root, new_node.parent.parent)
 
-        else:
-            y = new_node.parent.parent.left
-            if y.color == "red":
-                new_node.parent.color = "gray"
-                y.color = "gray"
-                new_node.parent.parent.color = "red"
-                new_node = new_node.parent.parent
-            elif new_node == new_node.parent.left:
-                new_node = new_node.parent
-                right_rotate(root, new_node)
-            else:
-                new_node.parent.color = "gray"
-                new_node.parent.parent.color = "red"
-                left_rotate(root, new_node.parent.parent)
+        # else:
+        #     y = new_node.parent.parent.left
+        #     if y.color == "red":
+        #         new_node.parent.color = "gray"
+        #         y.color = "gray"
+        #         new_node.parent.parent.color = "red"
+        #         new_node = new_node.parent.parent
+        #     elif new_node == new_node.parent.left:
+        #         new_node = new_node.parent
+        #         right_rotate(root, new_node)
+        #     else:
+        #         new_node.parent.color = "gray"
+        #         new_node.parent.parent.color = "red"
+        #         left_rotate(root, new_node.parent.parent)
 
     root.color = "gray"
 
@@ -133,15 +134,15 @@ def rb_insert(root: Node, new_node: Node) -> None:
     new_node.right = None
     new_node.color = "red"
     print("new_parent: ", new_node.parent.color)
-    print("ok")
     rb_insert_fixup(root, new_node)
 
 
 def rb_tree(data: list):
     # print(data)
-    root = Node("gray", data[0], None, None, None)
+    nil = Node("gray", data[0], None, None, None)
+    root = Node("gray", data[0], None, None, nil)
     for i in range(1, len(data)):
-        new_node = Node("red", data[i], None, None, None)
+        new_node = Node("red", data[i], nil, nil, None)
         print("data: ", data[i])
         rb_insert(root, new_node)
     
@@ -154,7 +155,7 @@ def rb_tree(data: list):
 
 
 def main():
-    list1 = [1, 2, 4, 5, 7, 8, 11, 14, 15]
+    # list1 = [1, 2, 4, 5, 7, 8, 11, 14, 15]
     list2 = [7, 2, 14, 5, 1, 8, 11, 4, 15]
     rb_tree(list2)
 
