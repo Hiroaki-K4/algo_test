@@ -59,6 +59,7 @@ def left_rotate(root: Node, x: Node) -> Node:
     y.left = x
     x.parent = y
     print("left1: ", x.parent.key)
+    print("left_root: ", root.key)
     return root
 
 
@@ -89,7 +90,6 @@ def right_rotate(root: Node, y: Node) -> Node:
 
 def rb_insert_fixup(root: Node, new_node: Node) -> None:
     while new_node.parent != None and new_node.parent.color == "red":
-        print("new_node: ", new_node.key)
         if new_node.parent == new_node.parent.parent.left:
             y = new_node.parent.parent.right
             if y != None and y.color == "red":
@@ -120,15 +120,16 @@ def rb_insert_fixup(root: Node, new_node: Node) -> None:
             elif new_node == new_node.parent.left:
                 print("pattern5")
                 new_node = new_node.parent
-                right_rotate(root, new_node)
+                root = right_rotate(root, new_node)
             else:
                 print("pattern6")
                 new_node.parent.color = "gray"
                 new_node.parent.parent.color = "red"
                 print("new_node_granpa: ", new_node.parent.parent.key)
-                left_rotate(root, new_node.parent.parent)
+                root = left_rotate(root, new_node.parent.parent)
 
     root.color = "gray"
+    print("root: ", root.key)
     return root
 
 
@@ -155,7 +156,6 @@ def rb_insert(root: Node, new_node: Node, nil: Node) -> Node:
     new_node.right = None
     new_node.color = "red"
     root = rb_insert_fixup(root, new_node)
-    print("root: ", root.key)
     return root
 
 
@@ -178,10 +178,9 @@ def rb_tree(data: list):
 
 
 def main():
-    # list2 = [7, 2, 14, 5, 1, 8, 11, 4, 15, 17, 18, 19, 20, 21, 23, 24, 25, 30, 35]
+    list2 = [7, 2, 14, 5, 1, 8, 11, 4, 15, 17, 18, 19, 20, 21, 23, 24, 25, 30, 35]
     # list2 = [7, 2, 14, 25, 12, 13, 11, 20, 15, 30]
     # list2 = [11, 2, 1, 7, 5, 8, 14, 15, 4]
-    list2 = [11, 2, 1, 7, 5, 8, 14, 15]
     rb_tree(list2)
 
 
