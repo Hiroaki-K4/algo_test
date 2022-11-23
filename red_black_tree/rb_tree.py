@@ -199,7 +199,7 @@ def tree_minimum(node: Node) -> Node:
     return node
 
 
-def rb_insert_fixup(root: Node, x: Node) -> None:
+def rm_delete_fixup(root: Node, x: Node) -> None:
     return
 
 def rb_delete(root: Node, rm_node: Node) -> None:
@@ -257,7 +257,6 @@ def rb_tree(data: list) -> None:
 def main():
     for i in tqdm(range(10000)):
         random_list = random.sample(range(10000), 100)
-        print(random_list)
         rb_tree(random_list)
     # list2 = [7, 11, 5, 32, 4, 25, 6]
     # rb_tree(list2)
