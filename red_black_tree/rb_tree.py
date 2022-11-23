@@ -3,6 +3,7 @@ from typing import Any, Type
 import pydot
 import random
 import copy
+from tqdm import tqdm
 
 
 class Node:
@@ -137,7 +138,7 @@ def rb_insert(root: Node, new_node: Node) -> Node:
     return root
 
 
-def test_tree(node: Node, node_list: list, node_len_list: list) -> Node:
+def get_black_nodes(node: Node, node_list: list, node_len_list: list) -> Node:
     if node.left is None and node.right is None:
         if node.color == "gray":
             node_list.append(node.key)
@@ -146,17 +147,45 @@ def test_tree(node: Node, node_list: list, node_len_list: list) -> Node:
     elif node.left is not None and node.right is not None:
         if node.color == "gray":
             node_list.append(node.key)
-        test_tree(node.left, copy.copy(node_list), node_len_list)
-        test_tree(node.right, copy.copy(node_list), node_len_list)
+        get_black_nodes(node.left, copy.copy(node_list), node_len_list)
+        get_black_nodes(node.right, copy.copy(node_list), node_len_list)
     elif node.left is not None:
         if node.color == "gray":
             node_list.append(node.key)
-        test_tree(node.left, copy.copy(node_list), node_len_list)
+        get_black_nodes(node.left, copy.copy(node_list), node_len_list)
     else:
         if node.color == "gray":
             node_list.append(node.key)
-        test_tree(node.right, copy.copy(node_list), node_len_list)
+        get_black_nodes(node.right, copy.copy(node_list), node_len_list)
 
+
+def test_tree(root: Node) -> None:
+    node_list = []
+    node_len_list = []
+    get_black_nodes(root, node_list, node_len_list)
+    for i in range(1, len(node_len_list)):
+        if node_len_list[i - 1] != node_len_list[i]:
+            raise RuntimeError("Error!!!!")
+
+
+def get_node(curr_node: Node, num: int, remove_node_list: list) -> None:
+    if curr_node.key == num:
+        remove_node_list.append(curr_node)
+        return
+    elif curr_node.left is None and curr_node.right is None:
+        return
+    elif curr_node.left is not None and curr_node.right is not None:
+        get_node(curr_node.left, num, remove_node_list)
+        get_node(curr_node.right, num, remove_node_list)
+    elif curr_node.left is not None:
+        get_node(curr_node.left, num, remove_node_list)
+    elif curr_node.right is not None:
+        get_node(curr_node.right, num, remove_node_list)
+
+
+def rb_delete(root: Node, new_node: Node) -> Node:
+    print("rb_delete: ", new_node.key)
+    return root
 
 
 def rb_tree(data: list) -> None:
@@ -165,27 +194,31 @@ def rb_tree(data: list) -> None:
         new_node = Node("red", data[i], None, None, None)
         root = rb_insert(root, new_node)
 
+        # Test rb_tree
+        test_tree(root)
+
+    for i in range(len(data)):
+        remove_node_list = []
+        remove_num = random.choice(data)
+        get_node(root, remove_num, remove_node_list)
+        rb_delete(root, remove_node_list[0])
+        data.remove(remove_num)
+
+
     # Draw tree graph
-    # graph = pydot.Dot(graph_type = 'graph', strict=True)
-    # x = pydot.Node(root.key, style="filled", fillcolor=root.color)
-    # graph.add_node(x)
-    # draw_tree(graph, root)
-    node_list = []
-    node_len_list = []
-    test_tree(root, node_list, node_len_list)
-    for i in range(1, len(node_len_list)):
-        if node_len_list[i - 1] != node_len_list[i]:
-            print("Error!!!!")
-            break
-    print("TEST OK: ", data)
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    graph = pydot.Dot(graph_type = 'graph', strict=True)
+    x = pydot.Node(root.key, style="filled", fillcolor=root.color)
+    graph.add_node(x)
+    draw_tree(graph, root)
 
 
 def main():
-    for i in range(10000):
-        random_list = random.sample(range(10000), 100)
-        rb_tree(random_list)
-
+    # for i in tqdm(range(10000)):
+    #     random_list = random.sample(range(10000), 100)
+    #     rb_tree(random_list)
+    list2 = [7, 11, 5, 32, 4, 25, 6]
+    rb_tree(list2)
+    print("TEST OK")
 
 
 if __name__ == '__main__':
