@@ -165,7 +165,32 @@ def test_tree(root: Node) -> None:
     get_black_nodes(root, node_list, node_len_list)
     for i in range(1, len(node_len_list)):
         if node_len_list[i - 1] != node_len_list[i]:
-            raise RuntimeError("Error!!!!")
+            raise RuntimeError("Tree error!!!!")
+
+
+def get_all_node_key(node: Node, key_list: list) -> None:
+    if node.left is None and node.right is None:
+        key_list.append(node.key)
+        return
+    elif node.left is not None and node.right is not None:
+        key_list.append(node.key)
+        get_all_node_key(node.left, key_list)
+        get_all_node_key(node.right, key_list)
+    elif node.left is not None:
+        key_list.append(node.key)
+        get_all_node_key(node.left, key_list)
+    elif node.right is not None:
+        key_list.append(node.key)
+        get_all_node_key(node.right, key_list)
+
+
+def test_delete(root: Node, delete_num: int) -> None:
+    key_list = []
+    get_all_node_key(root, key_list)
+    print("delete_num: ", delete_num)
+    print("all_list: ", key_list)
+    if delete_num in key_list:
+        raise RuntimeError("Delete error!!!!")
 
 
 def get_node(curr_node: Node, num: int, remove_node_list: list) -> None:
@@ -258,9 +283,9 @@ def rb_tree(data: list) -> None:
     #     data.remove(remove_num)
 
     remove_node_list = []
-    get_node(root, 7, remove_node_list)
-    print("root: ", root.key)
+    get_node(root, 8, remove_node_list)
     root = rb_delete(root, remove_node_list[0])
+    test_delete(root, 8)
 
 
     # Draw tree graph
@@ -274,7 +299,7 @@ def main():
     # for i in tqdm(range(10000)):
     #     random_list = random.sample(range(10000), 100)
     #     rb_tree(random_list)
-    list2 = [7, 11, 5, 32, 4, 25, 6]
+    list2 = [7, 11, 5, 32, 4, 25, 6, 8, 1, 3, 2, 10, 12, 14, 20]
     rb_tree(list2)
     print("TEST OK")
 
