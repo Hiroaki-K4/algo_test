@@ -187,8 +187,6 @@ def get_all_node_key(node: Node, key_list: list) -> None:
 def test_delete(root: Node, delete_num: int) -> None:
     key_list = []
     get_all_node_key(root, key_list)
-    print("delete_num: ", delete_num)
-    print("all_list: ", key_list)
     if delete_num in key_list:
         raise RuntimeError("Delete error!!!!")
 
@@ -210,16 +208,13 @@ def get_node(curr_node: Node, num: int, remove_node_list: list) -> None:
 
 def rb_transplant(root: Node, before: Node, after: Node) -> Node:
     if before.parent == None:
-        print("none")
         root = after
-        print("rooting: ", root.key)
     elif before == before.parent.left:
         before.parent.left = after
     else:
         before.parent.right = after
     if after is not None:
         after.parent = before.parent
-    print("rooting: ", root.key)
     return root
 
 
@@ -230,21 +225,82 @@ def tree_minimum(node: Node) -> Node:
 
 
 def rb_delete_fixup(root: Node, x: Node) -> Node:
+    print("fixup: ", root.key)
+    while x is not None and x != root and x.color == "gray":
+        if x == x.parent.left:
+            w = x.parent.right
+            if w is not None and w.color == "red":
+                print("pattern1")
+                w.color = "gray"
+                x.parent.color = "red"
+                root = left_rotate(root, x.parent)
+                w = x.parent.right
+            if w is None or ((w.left is None or w.left.color == "gray") and (w.right is None or w.right.color == "gray")):
+                print("pattern2")
+                if w is not None:
+                    w.color = "red"
+                x = x.parent
+            elif w.right is None or (w.right is not None and w.right.color == "gray"):
+                print("pattern3")
+                w.left.color = "gray"
+                w.color = "red"
+                root = right_rotate(root, w)
+                w = x.parent.right
+            else:
+                print("pattern4")
+                w.color = x.parent.color
+                x.parent.color = "gray"
+                w.right.color = "gray"
+                root = left_rotate(root, x.parent)
+                print("x_pa: " ,x.parent.key)
+                print("4: ", root.key)
+                x = root
+        else:
+            w = x.parent.left
+            if w is not None and w.color == "red":
+                print("pattern5")
+                w.color = "gray"
+                x.parent.color = "red"
+                root = right_rotate(root, x.parent)
+                w = x.parent.left
+            if w is None or ((w.left is None or w.left.color == "gray") and (w.right is None or w.right.color == "gray")):
+                print("pattern6")
+                if w is not None:
+                    w.color = "red"
+                x = x.parent
+            elif w.left is None or (w.left is not None and w.left.color == "gray"):
+                print("pattern7")
+                w.right.color = "gray"
+                w.color = "red"
+                root = left_rotate(root, w)
+                w = x.parent.left
+            else:
+                print("pattern8")
+                w.color = x.parent.color
+                x.parent.color = "gray"
+                w.left.color = "gray"
+                root = right_rotate(root, x.parent)
+                x = root
     return root
+
 
 def rb_delete(root: Node, rm_node: Node) -> Node:
     print("rb_delete: ", rm_node.key)
+    if rm_node == root and rm_node.left is None and rm_node.right is None:
+        return None
     y = rm_node
     y_original_color = y.color
     if rm_node.left == None:
+        print("rb_delete1")
         x = rm_node.right
         root = rb_transplant(root, rm_node, rm_node.right)
     elif rm_node.right == None:
+        print("rb_delete2")
         x = rm_node.left
         root = rb_transplant(root, rm_node, rm_node.left)
     else:
+        print("rb_delete3")
         y = tree_minimum(rm_node.right)
-        print("y: ", y.key)
         y_original_color = y.color
         x = y.right
         if y.parent == rm_node:
@@ -255,9 +311,6 @@ def rb_delete(root: Node, rm_node: Node) -> Node:
             y.right = rm_node.right
             y.right.parent = y
         root = rb_transplant(root, rm_node, y)
-        print("root.key:", root.key)
-        print("rm_node.key:", rm_node.key)
-        print("y.key:", y.key)
         y.left = rm_node.left
         y.left.parent = y
         y.color = rm_node.color
@@ -273,34 +326,41 @@ def rb_tree(data: list) -> None:
         root = rb_insert(root, new_node)
 
         # Test rb_tree
-        # test_tree(root)
+        test_tree(root)
 
-    # for i in range(len(data)):
-    #     remove_node_list = []
-    #     remove_num = random.choice(data)
-    #     get_node(root, remove_num, remove_node_list)
-    #     rb_delete(root, remove_node_list[0])
-    #     data.remove(remove_num)
-
-    remove_node_list = []
-    get_node(root, 8, remove_node_list)
-    root = rb_delete(root, remove_node_list[0])
-    test_delete(root, 8)
+    for remove_num in data:
+        # if remove_num == 2331:
+            # break
+        remove_node_list = []
+        get_node(root, remove_num, remove_node_list)
+        print("len: ", len(remove_node_list))
+        root = rb_delete(root, remove_node_list[0])
+        # print("root: ", root.left.key)
+        if root is None:
+            continue
+        test_delete(root, remove_num)
 
 
     # Draw tree graph
-    graph = pydot.Dot(graph_type = 'graph', strict=True)
-    x = pydot.Node(root.key, style="filled", fillcolor=root.color)
-    graph.add_node(x)
-    draw_tree(graph, root)
+    if root is not None:
+        graph = pydot.Dot(graph_type = 'graph', strict=True)
+        x = pydot.Node(root.key, style="filled", fillcolor=root.color)
+        graph.add_node(x)
+        draw_tree(graph, root)
 
 
 def main():
-    # for i in tqdm(range(10000)):
-    #     random_list = random.sample(range(10000), 100)
-    #     rb_tree(random_list)
-    list2 = [7, 11, 5, 32, 4, 25, 6, 8, 1, 3, 2, 10, 12, 14, 20]
-    rb_tree(list2)
+    for i in tqdm(range(10000)):
+        random_list = random.sample(range(10000), 100)
+        # random_list = random.sample(range(10000), 10)
+        print("random_list: ", random_list)
+        rb_tree(random_list)
+    # list2 = [7, 11, 5, 32, 4, 25, 6, 8, 1, 3, 2, 10, 12, 14, 20]
+    # list2 = [606, 702, 1937, 6219, 2108, 6576, 5893, 9346, 8785, 7892]
+    # list2 = [4045, 9811, 303, 9696, 4714, 9138, 8574, 4781, 4720, 5454]
+    # list2 = [4650, 8704, 9505, 8234, 4025, 6241, 8573, 7992, 28, 9580]
+    # list2 = [149, 780, 8259, 6204, 8611, 998, 2069, 2331, 7617, 5882]
+    # rb_tree(list2)
     print("TEST OK")
 
 
