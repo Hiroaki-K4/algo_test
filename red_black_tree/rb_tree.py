@@ -225,9 +225,11 @@ def tree_minimum(node: Node) -> Node:
 
 
 def rb_delete_fixup(root: Node, x: Node) -> Node:
-    print("fixup: ", root.key)
-    while x is not None and x != root and x.color == "gray":
-        if x == x.parent.left:
+    # print("rb_delete_fixup x: ", x.key)
+    # if x is None:
+        # return root
+    while x != root and (x is None or x.color == "gray"):
+        if x is not None and x == x.parent.left:
             w = x.parent.right
             if w is not None and w.color == "red":
                 print("pattern1")
@@ -256,7 +258,10 @@ def rb_delete_fixup(root: Node, x: Node) -> Node:
                 print("4: ", root.key)
                 x = root
         else:
-            w = x.parent.left
+            if x is not None:
+                w = x.parent.left
+            else:
+                w = None
             if w is not None and w.color == "red":
                 print("pattern5")
                 w.color = "gray"
@@ -267,7 +272,9 @@ def rb_delete_fixup(root: Node, x: Node) -> Node:
                 print("pattern6")
                 if w is not None:
                     w.color = "red"
-                x = x.parent
+                    x = x.parent
+                else:
+                    break
             elif w.left is None or (w.left is not None and w.left.color == "gray"):
                 print("pattern7")
                 w.right.color = "gray"
@@ -281,6 +288,12 @@ def rb_delete_fixup(root: Node, x: Node) -> Node:
                 w.left.color = "gray"
                 root = right_rotate(root, x.parent)
                 x = root
+    if x is not None:
+        x.color = "gray"
+        print("x_key: ", x.key)
+        print("x_color: ", x.color)
+    else:
+        print("none")
     return root
 
 
@@ -290,7 +303,7 @@ def rb_delete(root: Node, rm_node: Node) -> Node:
         return None
     y = rm_node
     y_original_color = y.color
-    if rm_node.left == None:
+    if rm_node.left == None: 
         print("rb_delete1")
         x = rm_node.right
         root = rb_transplant(root, rm_node, rm_node.right)
@@ -329,8 +342,8 @@ def rb_tree(data: list) -> None:
         test_tree(root)
 
     for remove_num in data:
-        # if remove_num == 2331:
-            # break
+        if remove_num == 7391:
+            break
         remove_node_list = []
         get_node(root, remove_num, remove_node_list)
         print("len: ", len(remove_node_list))
@@ -338,6 +351,7 @@ def rb_tree(data: list) -> None:
         # print("root: ", root.left.key)
         if root is None:
             continue
+        test_tree(root)
         test_delete(root, remove_num)
 
 
@@ -350,17 +364,14 @@ def rb_tree(data: list) -> None:
 
 
 def main():
-    for i in tqdm(range(10000)):
-        random_list = random.sample(range(10000), 100)
-        # random_list = random.sample(range(10000), 10)
-        print("random_list: ", random_list)
-        rb_tree(random_list)
+    # for i in tqdm(range(10000)):
+    #     # random_list = random.sample(range(10000), 100)
+    #     random_list = random.sample(range(10000), 10)
+    #     print("random_list: ", random_list)
+    #     rb_tree(random_list)
     # list2 = [7, 11, 5, 32, 4, 25, 6, 8, 1, 3, 2, 10, 12, 14, 20]
-    # list2 = [606, 702, 1937, 6219, 2108, 6576, 5893, 9346, 8785, 7892]
-    # list2 = [4045, 9811, 303, 9696, 4714, 9138, 8574, 4781, 4720, 5454]
-    # list2 = [4650, 8704, 9505, 8234, 4025, 6241, 8573, 7992, 28, 9580]
-    # list2 = [149, 780, 8259, 6204, 8611, 998, 2069, 2331, 7617, 5882]
-    # rb_tree(list2)
+    list2 = [795, 5642, 5418, 259, 4589, 2115, 7391, 3058, 991, 7104]
+    rb_tree(list2)
     print("TEST OK")
 
 
